@@ -16,7 +16,7 @@ df = df[
 def draw_line_plot():
     # Draw line plot
     fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(df.index, df["value"], color="red" linewidth=1)
+    ax.plot(df.index, df["value"], color="red", linewidth=1)
 
     ax.set_title("Daily freeCodeCamp Forum Page Views 5/2016-12/2019")
     ax.set_xlabel("Date")
@@ -29,12 +29,17 @@ def draw_line_plot():
 
 def draw_bar_plot():
     # Copy and modify data for monthly bar plot
-    df_bar = None
+    df["month"] = df.index.month
+    df["year"] = df.index.year
+    df_bar = df.groupby(["year", "month"])["value"].mean()
+    df_bar = df_bar.unstack()
 
     # Draw bar plot
-    fig = plt.subplots()
+    fig = df_bar.plot(kind="bar", figsize=(13, 6), legend=True, xlabel="Years", ylabel="Average Page Views").figure
+    plt.legend(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'])
 
-
+    plt.xticks(fontsize = 8)
+    plt.yticks(fontsize = 8)
 
 
     # Save image and return fig (don't change this part)
@@ -50,8 +55,21 @@ def draw_box_plot():
 
     # Draw box plots (using Seaborn)
 
+    df_box["month_num"] = df_box["date"].dt.month
+    df_box = df_box.sort_values("month_num")
 
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
+    axes[0] = sns.boxplot(x="year", y="value", data=df_box, ax=axes[0])
+    axes[1] = sns.boxplot(x="month", y="value", data=df_box, ax=axes[1])
 
+    axes[0].set_title("Year-wise Box Plot (Trend)")
+    axes[0].set_xlabel("Year")
+    axes[0].set_ylabel("Page Views")
+
+    axes[1].set_title("Month-wise Box Plot (Seasonality)")
+    axes[1].set_xlabel("Month")
+    axes[1].set_ylabel("Page Views")
+  
 
 
     # Save image and return fig (don't change this part)
